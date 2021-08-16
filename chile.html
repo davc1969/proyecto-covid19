@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <!-- Descripcion de creación -->
+    <meta name="description" content="Curso JavaScript - JWT, API">
+    <meta name="keywords" content="HTML, CSS, JavaScript, Bootstrap, JWT, API">
+    <meta name="author" content="Darío Valenzuela">
+    
+    <!-- Descripción de visualización -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Declaración de archivo para Favicon  -->
+    <link rel="shortcut icon" type="image/png" href="assets/img/covid.png">
+
+    <!-- Conexión con Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- A continuación se conecta la fuente deseada (cambiar xxxxxxxxx)-->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300&display=swap" rel="stylesheet">
+
+    <!-- Conexión a repositorio FONTAWESOME para inclusión de iconos -->
+    <script src="https://kit.fontawesome.com/5591d98e04.js" crossorigin="anonymous"></script>
+
+    <!-- Declaración de hojas de estilo -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/styles.css">
+
+    <!-- Título de la página -->
+    <title>Chile Covid19</title>
+</head>
+
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <a class="navbar-brand" href="#">Covid19</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+            <div class="navbar-nav" id="menuOptions">
+                <a class="nav-item nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-item nav-link active" href="#">Situación Chile</a>
+                <a class="nav-item nav-link" href="index.html" onclick="closeSession()">Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+
+    <main>
+        <div class="mx-auto mt-5" id="chartContainer" style="height: 600px; width: 80%;"></div>
+
+
+
+    </main>
+
+    <footer>
+
+    </footer>
+
+
+<!-- SCRIPTS de jquery y bootstraps para manejo correcto de framework Bootstrap -->
+
+    <!--jQuery 3.6.0-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!--Popper JS 1.14.3-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
+
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+
+    <!--Scripts Personales-->
+    <script src="assets/scriptschile.js"></script>
+
+</body>
+
+
+</html>
