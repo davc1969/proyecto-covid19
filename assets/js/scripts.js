@@ -8,7 +8,6 @@ const callModal2 =  (country) => {
 function closeSession() {
     localStorage.removeItem("jwt-token");
     window.reload;
-    alert("index cerró")
 }
 
 window.onload =  async function(){
@@ -28,10 +27,8 @@ window.onload =  async function(){
         const {data}   = await response.json()
 
         if (data) {
-//            console.log("onLoad: ", data);
-            
+
             const filteredData = data.filter(item => {return item.confirmed >= 1000000})
-//            console.log("filtrada: ", filteredData);
             const chartData = formatDataToChart(filteredData);
             createChart(chartData,"chartCanvas");
             fillTable(data, "tableBody");
@@ -136,7 +133,7 @@ function fillTable(data, idLocation) {
         dataTD += `  <td>${element.location}</td>`;
         dataTD += `  <td>${element.confirmed}</td>`;
         dataTD += `  <td>${element.deaths}</td>`;
-        dataTD += `  <td><button onclick=callModal("${element.location}")>Ver detalle</button></td>`;
+        dataTD += `  <td><button onclick=callModal("${element.location.replaceAll(" ", "_")}")>Ver detalle</button></td>`;
         row.innerHTML = dataTD;
         tableToBeFilled.appendChild(row)
     });
@@ -144,21 +141,22 @@ function fillTable(data, idLocation) {
 }
 
 const callModal = async (country) => { 
-    
+
+
     let modal1 = document.getElementById("modalCountry");
     document.getElementById("modalTitle").innerText = `Casos Covid19: ${country}`
 
     try {
         const urlCountry = `http://localhost:3000/api/countries/${country}`;
-        
+
         const response = await fetch(urlCountry);
-//        console.log("callModal response ", response);
-        
-        const {data}   = await response.json();
-//        console.log("callModal data ", data);
+        console.log("callModal response ", response);
+
+        const { [country]: data, dt, ts } = await response.json();
+        console.log("callModal data ", data);
 
         if (data) {
-           
+
             let dataChartCountry = [{
 
                 type: "column",
@@ -181,7 +179,7 @@ const callModal = async (country) => {
     } 
     catch (err) {
         alert ("Información no disponible para el país seleccionado");
-        console.error(`Error: ${err}`)
+        console.error(err)
     }
 
 
@@ -235,13 +233,5 @@ document.getElementById("formUserInput").addEventListener("submit", async (event
 const openSessionModal = async () => {
     await $("#modalCredentials").modal('show');
 }
-
-// document.getElementById("linkSession").addEventListener("click", (event) => {
-//     event.preventDefault;
-
-//     $("#modalCredentials").modal('show');
-
-// })
-
 
 

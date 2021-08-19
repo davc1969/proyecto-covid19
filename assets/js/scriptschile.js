@@ -1,11 +1,7 @@
 function closeSession() {
     localStorage.removeItem("jwt-token");
-//    location.href = "index.html";
     console.log("cerrar sesion");
-    alert("chile, cerrar")
 }
-
-
 
 
 window.onload =  async function(){
@@ -15,7 +11,6 @@ window.onload =  async function(){
     let dataRecovered;
 
     const jwt = localStorage.getItem("jwt-token");
-    console.log("inicio", jwt);
 
     try {
         console.log("entrando al try");
@@ -26,14 +21,10 @@ window.onload =  async function(){
                 Authorization: `Bearer ${jwt}`
             }
         });
-        console.log("response confirmed ", response);
         let {data}   = await response.json();
 
         if (data) {
-            //console.log("datos confirmados ", data);
-            //console.log("tipo de confirmados data", typeof data);
             dataConfirmed = await data;
-            //console.log("se obtuvo data confirmados ", dataConfirmed);
 
             const response = await fetch('http://localhost:3000/api/deaths',
             {
@@ -42,11 +33,8 @@ window.onload =  async function(){
                     Authorization: `Bearer ${jwt}`
                 }
             });
-            console.log("try dead response", response);
-            
-            data = await response.json();
 
-            console.log("dead data ", data);
+            data = await response.json();
 
             if (data) {
                 dataDeaths = await data;
@@ -63,11 +51,8 @@ window.onload =  async function(){
                 if (data) {
                     dataRecovered = await data;
                 }
-
             }
-
         }
-
 
     }
     catch (err) {
@@ -83,14 +68,10 @@ window.onload =  async function(){
     else {
         alert ("No se encontró la data")
     }
-
 };
 
 
 const createDataPoints = (confirmed, dead, recovered) => {
-
-    console.log("createData", confirmed);
-    console.log("createData ", dead);
 
     let newData = [{
         type: "line",
@@ -114,8 +95,6 @@ const createDataPoints = (confirmed, dead, recovered) => {
         dataPoints: []
     }];
 
-
-
     confirmed.forEach(element => {
         newData[0].dataPoints.push({
             x : formatDate(element.date),
@@ -133,19 +112,13 @@ const createDataPoints = (confirmed, dead, recovered) => {
     recovered.data.forEach((element, index) => {
         newData[2].dataPoints.push({
             x : formatDate(element.date),
-            y : element.total
+            y : (element.total > 0 ? element.total : null)
         });
     })
 
+    console.log("nd ", newData);
 
-    console.log("newdata ", newData);
-    return newData;
-}
-
-function createChartCountry(dataGraph) {
-
-
-    var chart = new CanvasJS.Chart("chartContainer", {
+    const dataToGraph = {
         exportEnabled: true,
         animationEnabled: true,
         title:{
@@ -154,9 +127,20 @@ function createChartCountry(dataGraph) {
         toolTip: {
             shared: true
         },
-        data: dataGraph
-    });
+        data: newData
+    }
 
+    return dataToGraph;
+
+}
+
+function createChartCountry(dataToGraph) {
+
+
+//    const savedData = JSON.stringify(dataToGraph);
+//    localStorage.setItem("data-Graph", savedData);
+
+    var chart = new CanvasJS.Chart("chartContainer", dataToGraph);
 
     chart.render();
 
@@ -166,7 +150,6 @@ function createChartCountry(dataGraph) {
 function formatDate(stringDate) {
 
     const splittedDate = stringDate.split("/");
-    //console.log("fecha separada", splittedDate);
-    return new Date(splittedDate[2] * 1 + 2000, splittedDate[0] * 1 , splittedDate[1] * 1)
+    return new Date(splittedDate[2] * 1  + 2000, splittedDate[0] * 1 - 1 , splittedDate[1] * 1)
 
 }
