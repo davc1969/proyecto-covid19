@@ -1,14 +1,16 @@
-const callModal2 =  (country) => { 
 
-    $("#modalCredentials").modal('show');
+import fetchData from "./fetchdata.js";
+import filterData from "./formatData.js"
+import {createChart, formatDataToChart} from "./chart.js";
+import fillTable from "./tables.js"
 
-}
+// filteredData es una variable Global que me permite filtlrar los datos a mostrar en el gráfico principal y cambair dinámicamente el gráfico
+let dataGlobal;
 
+// chartOptions es una variable global que me permite ver opciones sobre qué hay que graficar, tiene 4 valores posibles:
+// 0: no se grafica nada, 1: solo confirmados, 2: solo fallecidos, 3: ambas series de datos
+let chartOptions = 3;
 
-function closeSession() {
-    localStorage.removeItem("jwt-token");
-    window.reload;
-}
 
 window.onload =  async function(){
 
@@ -21,189 +23,23 @@ window.onload =  async function(){
         topMenu.innerHTML += `<btn class="nav-item nav-link" href="" id="linkSession" style="cursor: pointer;" onclick="callModal2('chile')">Iniciar Sesión</btn>`
     }
 
-
-    try {
-        const response = await fetch('http://localhost:3000/api/total');
-        const {data}   = await response.json()
+    const response = await fetchData('http://localhost:3000/api/total');
+    if (response) {
+        const {data} = await response.json();
 
         if (data) {
+            dataGlobal = data;
+            const limit = 1000000;
+            const filteredData = filterData(dataGlobal, limit);
+            createChart(filteredData, "chartContainer", `Países con mas de ${limit} casos confirmados de Covid19`, chartOptions);
 
-            const filteredData = data.filter(item => {return item.confirmed >= 1000000})
-            const chartData = formatDataToChart(filteredData);
-            createChart(chartData,"chartCanvas");
             fillTable(data, "tableBody");
+            
         }
     } 
-    catch (err) {
-        localStorage.clear()
-        console.error(`Error: ${err}`)
-    }
-
 };
 
-function formatDataToChart(data) {
-    let newData = [{
-        type: "column",
-        name: "Casos Activos",
-        showInLegend: true,
-        yValueFormatString: "0 casos",
-        dataPoints: []
-    }, 
-    {
-        type: "column",
-        name: "Fallecidos",
-        showInLegend: true,
-        yValueFormatString: "0 casos",
-        dataPoints: []
-    }];
 
-    data.forEach(element => {
-        newData[0].dataPoints.push(
-            {label : element.location,
-             y : element.confirmed
-            }
-        )
-        newData[1].dataPoints.push(
-            {label : element.location,
-             y : element.deaths
-            }
-        )
-    });
-
-    return newData
-}
-
-
-function createChart(dataGraph, idLocation) {
-
-
-    var chart = new CanvasJS.Chart("chartContainer", {
-        exportEnabled: true,
-        animationEnabled: true,
-        title:{
-            text: "Países con mas de 1.000.000 casos activos de Covid19"
-        },
-        toolTip: {
-            shared: true
-        },
-        data: dataGraph
-    });
-
-    console.log("chart:", idLocation, dataGraph);
-    chart.render();
-
-}
-
-function createChartCountry(dataGraph, idLocation) {
-
-
-    var chart = new CanvasJS.Chart("chartCountry", {
-        animationEnabled: true,
-        width: 450,
-        height: 300,
-        title:{
-            text: "confirmados y fallecidos"
-        },
-        toolTip: {
-            shared: true
-        },
-        data: dataGraph
-    });
-
-    console.log("chart:", idLocation, dataGraph);
-    chart.render();
-
-}
-
-{/* <tr>
-    <th scope="row">1</th>
-    <td>Mark</td>
-    <td>Otto</td>
-    <td>@mdo</td>
-    <td><a href="">Ver detalle</a></td>
-</tr> */}
-
-function fillTable(data, idLocation) {
-    let tableToBeFilled = document.getElementById(idLocation);
-//    console.log("fillTable: ", data);
-    data.forEach( (element, index) => {
-        let row = document.createElement('tr')
-        let dataTD = ""
-        dataTD += `  <td scope="row">${index + 1}</td>`;
-        dataTD += `  <td>${element.location}</td>`;
-        dataTD += `  <td>${element.confirmed}</td>`;
-        dataTD += `  <td>${element.deaths}</td>`;
-        dataTD += `  <td><button onclick=callModal("${element.location.replaceAll(" ", "_")}")>Ver detalle</button></td>`;
-        row.innerHTML = dataTD;
-        tableToBeFilled.appendChild(row)
-    });
-    
-}
-
-const callModal = async (country) => { 
-
-
-    let modal1 = document.getElementById("modalCountry");
-    document.getElementById("modalTitle").innerText = `Casos Covid19: ${country}`
-
-    try {
-        const urlCountry = `http://localhost:3000/api/countries/${country}`;
-
-        const response = await fetch(urlCountry);
-        console.log("callModal response ", response);
-
-        const { [country]: data, dt, ts } = await response.json();
-        console.log("callModal data ", data);
-
-        if (data) {
-
-            let dataChartCountry = [{
-
-                type: "column",
-                yValueFormatString: "0 casos",
-                dataPoints: [{
-                    label: "Confirmados",
-                    y : data.confirmed},
-                    {label : "Fallecidos",
-                    y : data.deaths }
-                ]
-            }]
-
-            console.log("callModal datachart", dataChartCountry);
-            createChartCountry(dataChartCountry,"chartCountry");
-        }
-        else { 
-            console.log("error 333333");
-            throw 404;
-        }
-    } 
-    catch (err) {
-        alert ("Información no disponible para el país seleccionado");
-        console.error(err)
-    }
-
-
-    $("#modalCountry").modal('show');
-
-}
-
-
-
-
-const getUserToken = async (email, password) => {
-    try {
-        const response = await fetch("http://localhost:3000/api/login", {
-            method: "POST",
-            body: JSON.stringify({ email: email, password: password }),
-        });
-        const { token } = await response.json();
-        console.log("getUserToken: ", token);
-        localStorage.setItem('jwt-token',token);
-        return token;
-    } catch (err) {
-        console.error(`Error: ${err}`);
-    }
-}
 
 
 
@@ -234,4 +70,115 @@ const openSessionModal = async () => {
     await $("#modalCredentials").modal('show');
 }
 
+
+
+const dropDownCases = document.getElementById("casesSelection");
+dropDownCases.addEventListener("change", (event) => {
+
+    const limit = parseInt(dropDownCases.value);
+    const filteredData = filterData(dataGlobal, limit);
+    createChart(filteredData, "chartContainer", `Países con mas de ${limit} casos confirmados de Covid19`, chartOptions);
+
+});
+
+const optionConfirmed = document.getElementById("confirmedCases");
+optionConfirmed.addEventListener("change", (event) => {
+
+    if (optionConfirmed.checked) {      //Está seleccionado
+        if (chartOptions == 0 || chartOptions == 2) {
+            chartOptions += 1;
+        }
+    } else {
+        if (chartOptions == 1 || chartOptions == 3) {
+            chartOptions -= 1;
+        }
+    }
+
+    const limit = parseInt(dropDownCases.value);
+    const filteredData = filterData(dataGlobal, limit);
+    createChart(filteredData, "chartContainer", `Países con mas de ${limit} casos confirmados de Covid19`, chartOptions);
+});
+
+const optionDeaths = document.getElementById("deathCases");
+optionDeaths.addEventListener("change", (event) => {
+
+    if (optionDeaths.checked) {      //Está seleccionado
+        if (chartOptions == 0 || chartOptions == 1) {
+            chartOptions += 2;
+        }
+    } else {
+        if (chartOptions == 2 || chartOptions == 3) {
+            chartOptions -= 2;
+        }
+    }
+
+    const limit = parseInt(dropDownCases.value);
+    const filteredData = filterData(dataGlobal, limit);
+    createChart(filteredData, "chartContainer", `Países con mas de ${limit} casos confirmados de Covid19`, chartOptions);
+});
+
+
+
+const callModalCountry =  (country) => { 
+
+    $("#modalCredentials").modal('show');
+
+}
+
+
+function closeSession() {
+    localStorage.removeItem("jwt-token");
+    window.reload;
+}
+
+
+function createChartCountry(dataGraph, idLocation) {
+
+
+    var chart = new CanvasJS.Chart("chartCountry", {
+        animationEnabled: true,
+        width: 450,
+        height: 300,
+        title:{
+            text: "confirmados y fallecidos"
+        },
+        toolTip: {
+            shared: true
+        },
+        data: dataGraph
+    });
+
+    console.log("chart:", idLocation, dataGraph);
+    chart.render();
+
+}
+
+{/* <tr>
+    <th scope="row">1</th>
+    <td>Mark</td>
+    <td>Otto</td>
+    <td>@mdo</td>
+    <td><a href="">Ver detalle</a></td>
+</tr> */}
+
+
+
+
+
+
+
+const getUserToken = async (email, password) => {
+    try {
+        const response = await fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            body: JSON.stringify({ email: email, password: password }),
+        });
+        const { token } = await response.json();
+        console.log("getUserToken: ", token);
+        localStorage.setItem('jwt-token',token);
+        return token;
+    } catch (err) {
+        console.error(`Error: ${err}`);
+    }
+}
 

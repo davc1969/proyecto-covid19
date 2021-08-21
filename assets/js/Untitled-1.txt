@@ -1,0 +1,9 @@
+Modulos a usar:
+ - fetch data
+ - login
+ - format data: dar formato a puntos para gráficos, / filtro de data para gráfico
+ - Chart
+ - Tabla
+ - modal país
+ - utils:
+    utilidades
